@@ -28,7 +28,7 @@ def main(_):
 
     # channel last -> (~/.keras/keras.json)
     model = alexnet((img_rows, img_cols, img_channels), 5)  # Binary classification
-    plot_model(model, to_file='model.png', show_shapes=True)
+    # plot_model(model, to_file='model.png', show_shapes=True)
     model.compile(loss='categorical_crossentropy',  # when multiclass classification, loss is categorical_crossentropy
                   optimizer='adam',
                   metrics=['accuracy'])
@@ -36,7 +36,11 @@ def main(_):
     callbacks = list()
     callbacks.append(ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6))
     callbacks.append(EarlyStopping(min_delta=0.001, patience=10))
-    callbacks.append(TensorBoard(batch_size=FLAGS.batch_size))
+    callbacks.append(TensorBoard(histogram_freq=1,
+                                 write_graph=False,
+                                 write_grads=True,
+                                 write_images=True,
+                                 batch_size=FLAGS.batch_size))
 
     print('Using real-time data augmentation.')
     # This will do preprocessing and realtime data augmentation:
