@@ -24,12 +24,12 @@ def main(_):
     # input image dimensions
     img_rows, img_cols = 400, 400
     # Images are RGB.
-    img_channels = 3
+    img_channels = 1
 
     # channel last -> (~/.keras/keras.json)
-    model = alexnet((img_rows, img_cols, img_channels), 1)  # Binary classification
+    model = alexnet((img_rows, img_cols, img_channels), 5)  # Binary classification
     plot_model(model, to_file='model.png', show_shapes=True)
-    model.compile(loss='binary_crossentropy',  # when multiclass classification, loss is categorical_crossentropy
+    model.compile(loss='categorical_crossentropy',  # when multiclass classification, loss is categorical_crossentropy
                   optimizer='adam',
                   metrics=['accuracy'])
 
@@ -46,26 +46,28 @@ def main(_):
         featurewise_std_normalization=False,  # divide inputs by std of the dataset
         samplewise_std_normalization=False,  # divide each input by its std
         zca_whitening=False,  # apply ZCA whitening
-        rotation_range=0,  # randomly rotate images in the range (degrees, 0 to 180)
+        rotation_range=180,  # randomly rotate images in the range (degrees, 0 to 180)
         width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
         height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
         horizontal_flip=True,  # randomly flip images
-        vertical_flip=False,  # randomly flip images
+        vertical_flip=True,  # randomly flip images
         validation_split=0.2)
 
     # Compute quantities required for featurewise normalization
     # (std, mean, and principal components if ZCA whitening is applied).
-    train_data_dir = "../pipe-screenshot-10k"
+    train_data_dir = "../multiclass-25k-binarize"
     train_generator = train_datagen.flow_from_directory(
         train_data_dir,
         target_size=(img_rows, img_cols),
-        class_mode='binary',
+        color_mode='grayscale',
+        class_mode='categorical',
         batch_size=FLAGS.batch_size,
         subset='training')
     validation_generator = train_datagen.flow_from_directory(
         train_data_dir,
         target_size=(img_rows, img_cols),
-        class_mode='binary',
+        color_mode='grayscale',
+        class_mode='categorical',
         batch_size=FLAGS.batch_size,
         subset='validation')
 
@@ -82,8 +84,9 @@ def main(_):
     # cf. https://medium.com/@vijayabhaskar96/
     # tutorial-image-classification-with-keras-flow-from-directory-and-generators-95f75ebe5720
     test_generator = train_datagen.flow_from_directory(
-        "../pipe-screenshot-test",
+        "../pipe-screenshot-test-binarize",
         target_size=(img_rows, img_cols),
+        color_mode='grayscale',
         class_mode=None,
         batch_size=1,
         shuffle=False)
