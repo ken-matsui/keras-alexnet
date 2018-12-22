@@ -50,13 +50,6 @@ def upload_multipart():
         pred_per = list(map(lambda x: x*100, pred))
         return make_response(jsonify(dict(zip(labels, pred_per))))
 
-        # if predicted_class_indices != 2:
-        #     return make_response("yes\n")
-        # elif pred[2] > 0.99:
-        #     return make_response("no\n")
-        # else:
-        #     return make_response("maybe\n")
-
 
 @app.errorhandler(werkzeug.exceptions.RequestEntityTooLarge)
 def handle_over_max_file_size(error):
